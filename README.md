@@ -72,12 +72,6 @@ Convert TTF and OTF fonts to web-optimized WOFF and WOFF2 formats with a single 
 
 Customize the extension behavior in VS Code settings (`File > Preferences > Settings` or `Ctrl+,`):
 
-| Setting                             | Type      | Default      | Description                                                                                                                                                         |
-| ----------------------------------- | --------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `easyFontConvert.outputDirectory`   | `string`  | `""` (empty) | **Absolute path** to output folder. Leave empty to save converted fonts in the same folder as the source file. Example: `C:/Users/username/Desktop/converted-fonts` |
-| `easyFontConvert.enableHinting`     | `boolean` | `true`       | **Font hinting** improves rendering on low-resolution screens. Disable for slightly smaller file sizes.                                                             |
-| `easyFontConvert.overwriteExisting` | `boolean` | `false`      | When `false`, you'll be prompted before overwriting existing files. Set to `true` for automatic overwriting.                                                        |
-
 ### Example Settings.json
 
 ```json

@@ -1,6 +1,6 @@
 {
-  "name": "easy-font-convert",
-  "displayName": "Easy Font Convert",
+  "name": "easy-font-converter",
+  "displayName": "Easy Font Converter",
   "description": "Fast and high-quality TTF/OTF font conversion to WOFF and WOFF2 formats",
   "version": "1.0.0",
   "publisher": "ovcharovcoder",
@@ -11,19 +11,18 @@
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ovcharovcoder/easy-font-convert"
+    "url": "https://github.com/ovcharovcoder/easy-font-converter"
   },
   "bugs": {
-    "url": "https://github.com/ovcharovcoder/easy-font-convert/issues"
+    "url": "https://github.com/ovcharovcoder/easy-font-converter/issues"
   },
-  "homepage": "https://github.com/ovcharovcoder/easy-font-convert#readme",
+  "homepage": "https://github.com/ovcharovcoder/easy-font-converter#readme",
   "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other",
-    "Programming Tools"
+    "Other"
   ],
   "keywords": [
     "font",
@@ -50,9 +49,9 @@
     "font-optimization"
   ],
   "activationEvents": [
-    "onCommand:easy-font-convert.convertToWoff",
-    "onCommand:easy-font-convert.convertToWoff2",
-    "onCommand:easy-font-convert.convertToBoth",
+    "onCommand:easy-font-converter.convertToWoff",
+    "onCommand:easy-font-converter.convertToWoff2",
+    "onCommand:easy-font-converter.convertToBoth",
     "onFileSystem:ttf",
     "onFileSystem:otf"
   ],
@@ -60,70 +59,70 @@
   "contributes": {
     "commands": [
       {
-        "command": "easy-font-convert.convertToWoff",
+        "command": "easy-font-converter.convertToWoff",
         "title": "Convert to WOFF",
-        "category": "Easy Font Convert"
+        "category": "Easy Font Converter"
       },
       {
-        "command": "easy-font-convert.convertToWoff2",
+        "command": "easy-font-converter.convertToWoff2",
         "title": "Convert to WOFF2",
-        "category": "Easy Font Convert"
+        "category": "Easy Font Converter"
       },
       {
-        "command": "easy-font-convert.convertToBoth",
+        "command": "easy-font-converter.convertToBoth",
         "title": "Convert to WOFF & WOFF2",
-        "category": "Easy Font Convert"
+        "category": "Easy Font Converter"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "easy-font-convert.convertToWoff",
-          "group": "1_font-convert@1",
+          "command": "easy-font-converter.convertToWoff",
+          "group": "1_font-converter@1",
           "when": "resourceExtname == .ttf || resourceExtname == .otf"
         },
         {
-          "command": "easy-font-convert.convertToWoff2",
-          "group": "1_font-convert@2",
+          "command": "easy-font-converter.convertToWoff2",
+          "group": "1_font-converter@2",
           "when": "resourceExtname == .ttf || resourceExtname == .otf"
         },
         {
-          "command": "easy-font-convert.convertToBoth",
-          "group": "1_font-convert@3",
+          "command": "easy-font-converter.convertToBoth",
+          "group": "1_font-converter@3",
           "when": "resourceExtname == .ttf || resourceExtname == .otf"
         }
       ],
       "commandPalette": [
         {
-          "command": "easy-font-convert.convertToWoff",
+          "command": "easy-font-converter.convertToWoff",
           "when": "false"
         },
         {
-          "command": "easy-font-convert.convertToWoff2",
+          "command": "easy-font-converter.convertToWoff2",
           "when": "false"
         },
         {
-          "command": "easy-font-convert.convertToBoth",
+          "command": "easy-font-converter.convertToBoth",
           "when": "true"
         }
       ]
     },
     "configuration": {
-      "title": "Easy Font Convert",
+      "title": "Easy Font Converter",
       "properties": {
-        "easyFontConvert.outputDirectory": {
+        "easyFontConverter.outputDirectory": {
           "type": "string",
           "default": "",
           "description": "Output directory for converted fonts (leave empty to save in the same folder as source)",
           "scope": "resource"
         },
-        "easyFontConvert.enableHinting": {
+        "easyFontConverter.enableHinting": {
           "type": "boolean",
           "default": true,
           "description": "Enable hinting for better font rendering on low-resolution screens",
           "scope": "resource"
         },
-        "easyFontConvert.overwriteExisting": {
+        "easyFontConverter.overwriteExisting": {
           "type": "boolean",
           "default": false,
           "description": "Overwrite existing files without asking",

@@ -1,12 +1,13 @@
-# Easy Font Convert
+# Easy Font Converter
 
 <div align="center">
   
 🚀 **Fast and high-quality font converter for VS Code**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/ovcharovcoder/easy-font-convert)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/ovcharovcoder/easy-font-converter)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![VS Code](https://img.shields.io/badge/vscode-1.85.0+-blue.svg)](https://code.visualstudio.com/)
+[![Marketplace](https://img.shields.io/badge/marketplace-available-orange.svg)](https://marketplace.visualstudio.com/items?itemName=ovcharovcoder.easy-font-converter)
 
 Convert TTF and OTF fonts to web-optimized WOFF and WOFF2 formats with a single click.
 
@@ -24,7 +25,7 @@ Convert TTF and OTF fonts to web-optimized WOFF and WOFF2 formats with a single 
 | 🎨 **Font Hinting**               | Optimize font rendering for low-resolution screens                |
 | 📊 **Progress Indicator**         | Real-time progress bar for large font files                       |
 | 💾 **Smart Overwrite Protection** | Never accidentally overwrite existing files                       |
-| 🚀 **One-click Conversion**       | No complex configuration needed - just click and convert          |
+| 🚀 **One-click Conversion**       | No complex configuration needed — just click and convert          |
 | 🖥️ **Command Palette Support**    | Use VS Code's command palette for keyboard-only workflow          |
 
 ---
@@ -52,7 +53,7 @@ Convert TTF and OTF fonts to web-optimized WOFF and WOFF2 formats with a single 
 ### Method 2: Command Palette
 
 1. Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS)
-2. Type "Easy Font Convert"
+2. Type "Easy Font Converter"
 3. Select your desired conversion command
 4. Choose a font file when prompted
 
@@ -60,11 +61,11 @@ Convert TTF and OTF fonts to web-optimized WOFF and WOFF2 formats with a single 
 
 ## ⌨️ Commands
 
-| Command                                      | Shortcut | Description                                          |
-| -------------------------------------------- | -------- | ---------------------------------------------------- |
-| `Easy Font Convert: Convert to WOFF`         | —        | Convert selected font to WOFF format only            |
-| `Easy Font Convert: Convert to WOFF2`        | —        | Convert selected font to WOFF2 format only           |
-| `Easy Font Convert: Convert to WOFF & WOFF2` | —        | Convert selected font to both formats simultaneously |
+| Command                                        | Shortcut | Description                                          |
+| ---------------------------------------------- | -------- | ---------------------------------------------------- |
+| `Easy Font Converter: Convert to WOFF`         | —        | Convert selected font to WOFF format only            |
+| `Easy Font Converter: Convert to WOFF2`        | —        | Convert selected font to WOFF2 format only           |
+| `Easy Font Converter: Convert to WOFF & WOFF2` | —        | Convert selected font to both formats simultaneously |
 
 ---
 
@@ -72,13 +73,19 @@ Convert TTF and OTF fonts to web-optimized WOFF and WOFF2 formats with a single 
 
 Customize the extension behavior in VS Code settings (`File > Preferences > Settings` or `Ctrl+,`):
 
+| Setting                               | Type      | Default | Description                                                          |
+| ------------------------------------- | --------- | ------- | -------------------------------------------------------------------- |
+| `easyFontConverter.outputDirectory`   | `string`  | `""`    | Output directory for converted fonts (leave empty for source folder) |
+| `easyFontConverter.enableHinting`     | `boolean` | `true`  | Enable hinting for better rendering on low-resolution screens        |
+| `easyFontConverter.overwriteExisting` | `boolean` | `false` | Overwrite existing files without asking                              |
+
 ### Example Settings.json
 
 ```json
 {
-  "easyFontConvert.outputDirectory": "D:/Projects/website/fonts",
-  "easyFontConvert.enableHinting": true,
-  "easyFontConvert.overwriteExisting": false
+  "easyFontConverter.outputDirectory": "D:/Projects/website/fonts",
+  "easyFontConverter.enableHinting": true,
+  "easyFontConverter.overwriteExisting": false
 }
 ```
 

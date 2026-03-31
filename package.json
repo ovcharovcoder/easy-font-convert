@@ -1,0 +1,153 @@
+{
+  "name": "easy-font-convert",
+  "displayName": "Easy Font Convert",
+  "description": "Fast and high-quality TTF/OTF font conversion to WOFF and WOFF2 formats",
+  "version": "1.0.0",
+  "publisher": "ovcharovcoder",
+  "author": {
+    "name": "Andrii Ovcharov",
+    "url": "https://github.com/ovcharovcoder"
+  },
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ovcharovcoder/easy-font-convert"
+  },
+  "bugs": {
+    "url": "https://github.com/ovcharovcoder/easy-font-convert/issues"
+  },
+  "homepage": "https://github.com/ovcharovcoder/easy-font-convert#readme",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Tools"
+  ],
+  "keywords": [
+    "font",
+    "fonts",
+    "converter",
+    "ttf",
+    "otf",
+    "woff",
+    "woff2",
+    "web-font",
+    "web-fonts",
+    "typography",
+    "font-converter",
+    "font-conversion",
+    "convert-font",
+    "ttf-to-woff",
+    "ttf-to-woff2",
+    "otf-to-woff",
+    "otf-to-woff2",
+    "font-tools",
+    "web-development",
+    "frontend",
+    "css",
+    "font-optimization"
+  ],
+  "activationEvents": [
+    "onCommand:easy-font-convert.convertToWoff",
+    "onCommand:easy-font-convert.convertToWoff2",
+    "onCommand:easy-font-convert.convertToBoth",
+    "onFileSystem:ttf",
+    "onFileSystem:otf"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "easy-font-convert.convertToWoff",
+        "title": "Convert to WOFF",
+        "category": "Easy Font Convert"
+      },
+      {
+        "command": "easy-font-convert.convertToWoff2",
+        "title": "Convert to WOFF2",
+        "category": "Easy Font Convert"
+      },
+      {
+        "command": "easy-font-convert.convertToBoth",
+        "title": "Convert to WOFF & WOFF2",
+        "category": "Easy Font Convert"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "easy-font-convert.convertToWoff",
+          "group": "1_font-convert@1",
+          "when": "resourceExtname == .ttf || resourceExtname == .otf"
+        },
+        {
+          "command": "easy-font-convert.convertToWoff2",
+          "group": "1_font-convert@2",
+          "when": "resourceExtname == .ttf || resourceExtname == .otf"
+        },
+        {
+          "command": "easy-font-convert.convertToBoth",
+          "group": "1_font-convert@3",
+          "when": "resourceExtname == .ttf || resourceExtname == .otf"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "easy-font-convert.convertToWoff",
+          "when": "false"
+        },
+        {
+          "command": "easy-font-convert.convertToWoff2",
+          "when": "false"
+        },
+        {
+          "command": "easy-font-convert.convertToBoth",
+          "when": "true"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Easy Font Convert",
+      "properties": {
+        "easyFontConvert.outputDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Output directory for converted fonts (leave empty to save in the same folder as source)",
+          "scope": "resource"
+        },
+        "easyFontConvert.enableHinting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable hinting for better font rendering on low-resolution screens",
+          "scope": "resource"
+        },
+        "easyFontConvert.overwriteExisting": {
+          "type": "boolean",
+          "default": false,
+          "description": "Overwrite existing files without asking",
+          "scope": "resource"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@types/fs-extra": "^11.0.4",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "dependencies": {
+    "fonteditor-core": "^2.1.0",
+    "fs-extra": "^11.2.0"
+  }
+}

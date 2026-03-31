@@ -109,6 +109,9 @@ If you enjoy Easy Font Convert, consider supporting the author:
 Released under the [MIT License](https://raw.githubusercontent.com/ovcharovcoder/easy-font-convert/main/LICENSE)
 
 ---
+
+## 🧑‍💻 Development & Build
+
 ```
 git clone https://github.com/ovcharovcoder/easy-font-convert.git
 npm install

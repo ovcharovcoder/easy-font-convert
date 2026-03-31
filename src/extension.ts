@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import { Font, woff2 } from 'fonteditor-core';
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('Easy Font Convert extension is now active');
+  console.log('Easy Font Converter extension is now active');
 
   // Initialize WOFF2 module
   try {
@@ -20,21 +20,21 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   const convertToWoff = vscode.commands.registerCommand(
-    'easy-font-convert.convertToWoff',
+    'easy-font-converter.convertToWoff',
     async (uri: vscode.Uri) => {
       await convertFont(uri, 'woff');
     },
   );
 
   const convertToWoff2 = vscode.commands.registerCommand(
-    'easy-font-convert.convertToWoff2',
+    'easy-font-converter.convertToWoff2',
     async (uri: vscode.Uri) => {
       await convertFont(uri, 'woff2');
     },
   );
 
   const convertToBoth = vscode.commands.registerCommand(
-    'easy-font-convert.convertToBoth',
+    'easy-font-converter.convertToBoth',
     async (uri: vscode.Uri) => {
       await convertFont(uri, 'both');
     },
@@ -67,14 +67,13 @@ async function convertFont(
   const dir = path.dirname(filePath);
   const baseName = path.basename(filePath, fileExt);
 
-  const config = vscode.workspace.getConfiguration('easyFontConvert');
+  const config = vscode.workspace.getConfiguration('easyFontConverter');
   const outputDir = config.get<string>('outputDirectory') || '';
   const enableHinting = config.get<boolean>('enableHinting') ?? true;
   const overwriteExisting = config.get<boolean>('overwriteExisting') ?? false;
 
   const outputPath = outputDir ? path.join(outputDir) : dir;
 
-  // Create output directory if it doesn't exist
   await fs.ensureDir(outputPath);
 
   try {
@@ -136,12 +135,10 @@ async function convertFont(
           progress.report({ increment: 80, message: 'Converting to WOFF2...' });
 
           try {
-            // Check and initialize WOFF2 module if needed
             if (woff2 && woff2.init) {
               const isInited = woff2.isInited ? woff2.isInited() : false;
               if (!isInited) {
                 woff2.init();
-                console.log('WOFF2 module initialized on demand');
               }
             }
 

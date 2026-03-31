@@ -107,3 +107,11 @@ If you enjoy Easy Font Convert, consider supporting the author:
 ## 🪪 License
 
 Released under the [MIT License](https://raw.githubusercontent.com/ovcharovcoder/easy-font-convert/main/LICENSE)
+
+---
+```
+git clone https://github.com/ovcharovcoder/easy-font-convert.git
+npm install
+npm run compile
+npm run package
+```

@@ -11,12 +11,12 @@
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ovcharovcoder/easy-font-converter"
+    "url": "https://github.com/ovcharovcoder/easy-font-convert"
   },
   "bugs": {
-    "url": "https://github.com/ovcharovcoder/easy-font-converter/issues"
+    "url": "https://github.com/ovcharovcoder/easy-font-convert/issues"
   },
-  "homepage": "https://github.com/ovcharovcoder/easy-font-converter#readme",
+  "homepage": "https://github.com/ovcharovcoder/easy-font-convert#readme",
   "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"

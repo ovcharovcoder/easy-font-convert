@@ -37,10 +37,22 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const path = __importStar(require("path"));
-const fs = __importStar(require("fs-extra"));
+const fs = __importStar(require("fs"));
 const fonteditor_core_1 = require("fonteditor-core");
+// Helper functions
+async function ensureDir(dir) {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+}
+async function pathExists(filePath) {
+    return fs.promises
+        .access(filePath)
+        .then(() => true)
+        .catch(() => false);
+}
 function activate(context) {
-    console.log('Easy Font Convert extension is now active');
+    console.log('Easy Font Converter extension is now active');
     // Initialize WOFF2 module
     try {
         if (fonteditor_core_1.woff2 && fonteditor_core_1.woff2.init) {
@@ -50,152 +62,211 @@ function activate(context) {
     }
     catch (error) {
         console.error('Failed to initialize WOFF2 module:', error);
-        vscode.window.showWarningMessage('WOFF2 support may not be available. WOFF conversion will still work.');
     }
-    const convertToWoff = vscode.commands.registerCommand('easy-font-convert.convertToWoff', async (uri) => {
-        await convertFont(uri, 'woff');
+    // Single file commands
+    const convertToWoff = vscode.commands.registerCommand('easy-font-converter.convertToWoff', async (uri) => {
+        const file = uri || (await selectSingleFile());
+        if (file) {
+            await convertSingleFont(file, 'woff');
+        }
     });
-    const convertToWoff2 = vscode.commands.registerCommand('easy-font-convert.convertToWoff2', async (uri) => {
-        await convertFont(uri, 'woff2');
+    const convertToWoff2 = vscode.commands.registerCommand('easy-font-converter.convertToWoff2', async (uri) => {
+        const file = uri || (await selectSingleFile());
+        if (file) {
+            await convertSingleFont(file, 'woff2');
+        }
     });
-    const convertToBoth = vscode.commands.registerCommand('easy-font-convert.convertToBoth', async (uri) => {
-        await convertFont(uri, 'both');
+    const convertToBoth = vscode.commands.registerCommand('easy-font-converter.convertToBoth', async (uri) => {
+        const file = uri || (await selectSingleFile());
+        if (file) {
+            await convertSingleFont(file, 'both');
+        }
     });
-    context.subscriptions.push(convertToWoff, convertToWoff2, convertToBoth);
-}
-async function convertFont(uri, format) {
-    if (!uri) {
-        const files = await vscode.window.showOpenDialog({
-            canSelectMany: false,
-            filters: {
-                'Font Files': ['ttf', 'otf'],
-            },
-            title: 'Select font file',
-        });
-        if (!files || files.length === 0) {
+    // Group commands - використовуємо глобальне сховище VS Code
+    const groupConvertToWoff = vscode.commands.registerCommand('easy-font-converter.groupConvertToWoff', async () => {
+        const uris = await getSelectedFilesFromExplorer();
+        if (uris.length === 0) {
+            vscode.window.showErrorMessage('No font files selected. Please select files first.');
             return;
         }
-        uri = files[0];
+        await groupConvertFontsSimple(uris, 'woff');
+    });
+    const groupConvertToWoff2 = vscode.commands.registerCommand('easy-font-converter.groupConvertToWoff2', async () => {
+        const uris = await getSelectedFilesFromExplorer();
+        if (uris.length === 0) {
+            vscode.window.showErrorMessage('No font files selected. Please select files first.');
+            return;
+        }
+        await groupConvertFontsSimple(uris, 'woff2');
+    });
+    const groupConvertToBoth = vscode.commands.registerCommand('easy-font-converter.groupConvertToBoth', async () => {
+        const uris = await getSelectedFilesFromExplorer();
+        if (uris.length === 0) {
+            vscode.window.showErrorMessage('No font files selected. Please select files first.');
+            return;
+        }
+        await groupConvertFontsSimple(uris, 'both');
+    });
+    context.subscriptions.push(convertToWoff, convertToWoff2, convertToBoth, groupConvertToWoff, groupConvertToWoff2, groupConvertToBoth);
+}
+// Головна функція для отримання виділених файлів з Explorer
+async function getSelectedFilesFromExplorer() {
+    try {
+        // Спосіб 1: Використовуємо стандартну команду VS Code
+        const selected = await vscode.commands.executeCommand('workbench.explorer.fileView.getSelection');
+        if (selected && selected.length > 0) {
+            const fontUris = selected.filter(uri => {
+                const ext = path.extname(uri.fsPath).toLowerCase();
+                return ext === '.ttf' || ext === '.otf';
+            });
+            if (fontUris.length > 0) {
+                console.log('Selected files:', fontUris.map(u => path.basename(u.fsPath)));
+                return fontUris;
+            }
+        }
     }
+    catch (error) {
+        console.log('Could not get selection from explorer:', error);
+    }
+    // Спосіб 2: Якщо не вдалося, показуємо діалог
+    const files = await vscode.window.showOpenDialog({
+        canSelectMany: true,
+        canSelectFiles: true,
+        canSelectFolders: false,
+        filters: {
+            'Font Files': ['ttf', 'otf'],
+        },
+        title: 'Select font files to convert',
+    });
+    return files || [];
+}
+async function selectSingleFile() {
+    const files = await vscode.window.showOpenDialog({
+        canSelectMany: false,
+        filters: {
+            'Font Files': ['ttf', 'otf'],
+        },
+        title: 'Select font file',
+    });
+    return files ? files[0] : undefined;
+}
+// Спрощена групова конвертація
+async function groupConvertFontsSimple(uris, format) {
+    if (uris.length === 0) {
+        vscode.window.showErrorMessage('No font files selected');
+        return;
+    }
+    const formatNames = format === 'both' ? 'WOFF & WOFF2' : format.toUpperCase();
+    // Підтвердження
+    const confirmed = await vscode.window.showInformationMessage(`Convert ${uris.length} font file(s) to ${formatNames}?`, 'Yes', 'No');
+    if (confirmed !== 'Yes') {
+        return;
+    }
+    let successCount = 0;
+    let failCount = 0;
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Converting ${uris.length} file(s) to ${formatNames}...`,
+        cancellable: true,
+    }, async (progress, token) => {
+        for (let i = 0; i < uris.length; i++) {
+            if (token.isCancellationRequested) {
+                break;
+            }
+            const uri = uris[i];
+            const fileName = path.basename(uri.fsPath);
+            progress.report({
+                increment: (i / uris.length) * 100,
+                message: `[${i + 1}/${uris.length}] ${fileName}`,
+            });
+            try {
+                await convertSingleFont(uri, format, true);
+                successCount++;
+                console.log(`✅ Converted: ${fileName}`);
+            }
+            catch (error) {
+                failCount++;
+                console.error(`❌ Failed to convert ${fileName}:`, error);
+            }
+        }
+    });
+    // Результат
+    if (successCount > 0) {
+        if (failCount > 0) {
+            vscode.window.showWarningMessage(`✅ Converted: ${successCount} files, ❌ Failed: ${failCount} files`);
+        }
+        else {
+            vscode.window.showInformationMessage(`✅ Successfully converted ${successCount} file(s) to ${formatNames}`);
+        }
+    }
+    else {
+        vscode.window.showErrorMessage(`❌ Conversion failed for all ${failCount} file(s)`);
+    }
+}
+async function convertSingleFont(uri, format, silent = false) {
     const filePath = uri.fsPath;
     const fileExt = path.extname(filePath).toLowerCase();
     const dir = path.dirname(filePath);
     const baseName = path.basename(filePath, fileExt);
-    const config = vscode.workspace.getConfiguration('easyFontConvert');
+    const config = vscode.workspace.getConfiguration('easyFontConverter');
     const outputDir = config.get('outputDirectory') || '';
     const enableHinting = config.get('enableHinting') ?? true;
     const overwriteExisting = config.get('overwriteExisting') ?? false;
     const outputPath = outputDir ? path.join(outputDir) : dir;
-    // Create output directory if it doesn't exist
-    await fs.ensureDir(outputPath);
-    try {
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Converting ${path.basename(filePath)}...`,
-            cancellable: false,
-        }, async (progress) => {
-            progress.report({ increment: 0, message: 'Reading font file...' });
-            const fontBuffer = await fs.readFile(filePath);
-            progress.report({ increment: 30, message: 'Processing font data...' });
-            const font = fonteditor_core_1.Font.create(fontBuffer, {
-                type: fileExt === '.ttf' ? 'ttf' : 'otf',
-                hinting: enableHinting,
-            });
-            const results = [];
-            if (format === 'woff' || format === 'both') {
-                progress.report({ increment: 50, message: 'Converting to WOFF...' });
-                try {
-                    const woffBuffer = font.write({
-                        type: 'woff',
-                        hinting: enableHinting,
-                    });
-                    const woffPath = path.join(outputPath, `${baseName}.woff`);
-                    const woffBufferData = Buffer.from(woffBuffer);
-                    if (!overwriteExisting && (await fs.pathExists(woffPath))) {
-                        const overwrite = await vscode.window.showWarningMessage(`${baseName}.woff already exists. Overwrite?`, 'Yes', 'No');
-                        if (overwrite !== 'Yes') {
-                            results.push({ format: 'WOFF', path: woffPath + ' (skipped)' });
-                        }
-                        else {
-                            await fs.writeFile(woffPath, woffBufferData);
-                            results.push({ format: 'WOFF', path: woffPath });
-                        }
-                    }
-                    else {
-                        await fs.writeFile(woffPath, woffBufferData);
-                        results.push({ format: 'WOFF', path: woffPath });
-                    }
-                }
-                catch (error) {
-                    console.error('WOFF conversion error:', error);
-                    results.push({ format: 'WOFF', path: 'conversion failed' });
-                }
-            }
-            if (format === 'woff2' || format === 'both') {
-                progress.report({ increment: 80, message: 'Converting to WOFF2...' });
-                try {
-                    // Check and initialize WOFF2 module if needed
-                    if (fonteditor_core_1.woff2 && fonteditor_core_1.woff2.init) {
-                        const isInited = fonteditor_core_1.woff2.isInited ? fonteditor_core_1.woff2.isInited() : false;
-                        if (!isInited) {
-                            fonteditor_core_1.woff2.init();
-                            console.log('WOFF2 module initialized on demand');
-                        }
-                    }
-                    const woff2Buffer = font.write({
-                        type: 'woff2',
-                        hinting: enableHinting,
-                    });
-                    const woff2Path = path.join(outputPath, `${baseName}.woff2`);
-                    const woff2BufferData = Buffer.from(woff2Buffer);
-                    if (!overwriteExisting && (await fs.pathExists(woff2Path))) {
-                        const overwrite = await vscode.window.showWarningMessage(`${baseName}.woff2 already exists. Overwrite?`, 'Yes', 'No');
-                        if (overwrite !== 'Yes') {
-                            results.push({
-                                format: 'WOFF2',
-                                path: woff2Path + ' (skipped)',
-                            });
-                        }
-                        else {
-                            await fs.writeFile(woff2Path, woff2BufferData);
-                            results.push({ format: 'WOFF2', path: woff2Path });
-                        }
-                    }
-                    else {
-                        await fs.writeFile(woff2Path, woff2BufferData);
-                        results.push({ format: 'WOFF2', path: woff2Path });
-                    }
-                }
-                catch (error) {
-                    console.error('WOFF2 conversion error:', error);
-                    results.push({ format: 'WOFF2', path: 'conversion failed' });
-                    vscode.window.showErrorMessage(`WOFF2 conversion failed: ${error}`);
-                }
-            }
-            progress.report({ increment: 100, message: 'Complete!' });
-            const successfulResults = results.filter(r => !r.path.includes('failed'));
-            const failedResults = results.filter(r => r.path.includes('failed'));
-            if (successfulResults.length > 0) {
-                const message = successfulResults
-                    .map(r => `${r.format}: ${path.basename(r.path)}`)
-                    .join(', ');
-                vscode.window.showInformationMessage(`✅ Font converted successfully! ${message}`);
-            }
-            if (failedResults.length > 0) {
-                const failedMessage = failedResults
-                    .map(r => `${r.format}`)
-                    .join(', ');
-                vscode.window.showWarningMessage(`⚠️ Some conversions failed: ${failedMessage}`);
-            }
+    await ensureDir(outputPath);
+    const fontBuffer = await fs.promises.readFile(filePath);
+    const font = fonteditor_core_1.Font.create(fontBuffer, {
+        type: fileExt === '.ttf' ? 'ttf' : 'otf',
+        hinting: enableHinting,
+    });
+    if (format === 'woff' || format === 'both') {
+        const woffBuffer = font.write({
+            type: 'woff',
+            hinting: enableHinting,
         });
-        const openFolder = await vscode.window.showInformationMessage('Open containing folder?', 'Yes', 'No');
-        if (openFolder === 'Yes') {
-            vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(outputPath));
+        const woffPath = path.join(outputPath, `${baseName}.woff`);
+        const woffBufferData = Buffer.from(woffBuffer);
+        const exists = await pathExists(woffPath);
+        if (!overwriteExisting && exists) {
+            if (!silent) {
+                const overwrite = await vscode.window.showWarningMessage(`${baseName}.woff already exists. Overwrite?`, 'Yes', 'No');
+                if (overwrite === 'Yes') {
+                    await fs.promises.writeFile(woffPath, woffBufferData);
+                }
+            }
+        }
+        else {
+            await fs.promises.writeFile(woffPath, woffBufferData);
         }
     }
-    catch (error) {
-        vscode.window.showErrorMessage(`❌ Conversion failed: ${error.message}`);
-        console.error(error);
+    if (format === 'woff2' || format === 'both') {
+        if (fonteditor_core_1.woff2 && fonteditor_core_1.woff2.init) {
+            const isInited = fonteditor_core_1.woff2.isInited ? fonteditor_core_1.woff2.isInited() : false;
+            if (!isInited) {
+                fonteditor_core_1.woff2.init();
+            }
+        }
+        const woff2Buffer = font.write({
+            type: 'woff2',
+            hinting: enableHinting,
+        });
+        const woff2Path = path.join(outputPath, `${baseName}.woff2`);
+        const woff2BufferData = Buffer.from(woff2Buffer);
+        const exists = await pathExists(woff2Path);
+        if (!overwriteExisting && exists) {
+            if (!silent) {
+                const overwrite = await vscode.window.showWarningMessage(`${baseName}.woff2 already exists. Overwrite?`, 'Yes', 'No');
+                if (overwrite === 'Yes') {
+                    await fs.promises.writeFile(woff2Path, woff2BufferData);
+                }
+            }
+        }
+        else {
+            await fs.promises.writeFile(woff2Path, woff2BufferData);
+        }
+    }
+    if (!silent) {
+        vscode.window.showInformationMessage(`✅ Font converted: ${baseName}`);
     }
 }
 function deactivate() { }

@@ -2,7 +2,7 @@
   "name": "easy-font-converter",
   "displayName": "Easy Font Converter",
   "description": "Fast and high-quality TTF/OTF font conversion to WOFF and WOFF2 formats",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "ovcharovcoder",
   "author": {
     "name": "Andrii Ovcharov",
@@ -52,6 +52,9 @@
     "onCommand:easy-font-converter.convertToWoff",
     "onCommand:easy-font-converter.convertToWoff2",
     "onCommand:easy-font-converter.convertToBoth",
+    "onCommand:easy-font-converter.groupConvertToWoff",
+    "onCommand:easy-font-converter.groupConvertToWoff2",
+    "onCommand:easy-font-converter.groupConvertToBoth",
     "onFileSystem:ttf",
     "onFileSystem:otf"
   ],
@@ -72,6 +75,21 @@
         "command": "easy-font-converter.convertToBoth",
         "title": "Convert to WOFF & WOFF2",
         "category": "Easy Font Converter"
+      },
+      {
+        "command": "easy-font-converter.groupConvertToWoff",
+        "title": "Group Convert to WOFF",
+        "category": "Easy Font Converter"
+      },
+      {
+        "command": "easy-font-converter.groupConvertToWoff2",
+        "title": "Group Convert to WOFF2",
+        "category": "Easy Font Converter"
+      },
+      {
+        "command": "easy-font-converter.groupConvertToBoth",
+        "title": "Group Convert to WOFF & WOFF2",
+        "category": "Easy Font Converter"
       }
     ],
     "menus": {
@@ -90,6 +108,21 @@
           "command": "easy-font-converter.convertToBoth",
           "group": "1_font-converter@3",
           "when": "resourceExtname == .ttf || resourceExtname == .otf"
+        },
+        {
+          "command": "easy-font-converter.groupConvertToWoff",
+          "group": "2_group-converter@1",
+          "when": "resourceExtname == .ttf || resourceExtname == .otf && resourceMultiSelected"
+        },
+        {
+          "command": "easy-font-converter.groupConvertToWoff2",
+          "group": "2_group-converter@2",
+          "when": "resourceExtname == .ttf || resourceExtname == .otf && resourceMultiSelected"
+        },
+        {
+          "command": "easy-font-converter.groupConvertToBoth",
+          "group": "2_group-converter@3",
+          "when": "resourceExtname == .ttf || resourceExtname == .otf && resourceMultiSelected"
         }
       ],
       "commandPalette": [
@@ -103,6 +136,18 @@
         },
         {
           "command": "easy-font-converter.convertToBoth",
+          "when": "true"
+        },
+        {
+          "command": "easy-font-converter.groupConvertToWoff",
+          "when": "false"
+        },
+        {
+          "command": "easy-font-converter.groupConvertToWoff2",
+          "when": "false"
+        },
+        {
+          "command": "easy-font-converter.groupConvertToBoth",
           "when": "true"
         }
       ]

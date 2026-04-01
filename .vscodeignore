@@ -1,12 +1,29 @@
-.vscode/**
-.vscode-test/**
-src/**
+# Source
+src/
+.tsconfig.json
+.vscode/
 .gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
+.vscodeignore
+
+# Development files
 **/*.map
 **/*.ts
-node_modules/.bin
-node_modules/@types
+**/tsconfig.json
+
+# Node modules (виключаємо майже все)
+node_modules/*
+!node_modules/fonteditor-core/dist/**/*.js
+!node_modules/fonteditor-core/package.json
+!node_modules/fs-extra/**/*.js
+!node_modules/fs-extra/package.json
+!node_modules/jsonfile/**/*.js
+!node_modules/universalify/**/*.js
+!node_modules/graceful-fs/**/*.js
+
+# Other
+.git/
+.vscode-test/
+*.vsix
+*.log
+*.md
+!README.md

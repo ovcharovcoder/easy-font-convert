@@ -115,7 +115,12 @@ If you enjoy Easy Font Convert, consider supporting the author:
 [Donate via PayPal](https://www.paypal.com/donate/?business=datoshcode@gmail.com)
 
 ---
-
+```
+git clone https://github.com/ovcharovcoder/easy-font-convert.git
+npm install
+npm run compile
+npm run package
+```
 ## 🪪 License
 
 Released under the [MIT License](https://raw.githubusercontent.com/ovcharovcoder/easy-font-convert/main/LICENSE)

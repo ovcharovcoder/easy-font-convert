@@ -2,7 +2,7 @@
   "name": "easy-font-converter",
   "displayName": "Easy Font Converter",
   "description": "Fast and high-quality TTF/OTF font conversion to WOFF and WOFF2 formats",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "ovcharovcoder",
   "author": {
     "name": "Andrii Ovcharov",
